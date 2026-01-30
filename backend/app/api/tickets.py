@@ -1,9 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
-from .. import models, schemas
-from .. database import get_db
+from app import models, schemas
+from app.database import get_db
 from typing import List, Optional
-
+from uuid import UUID
+import enum
 router = APIRouter()
 
 @router.post("/tickets",response_model=schemas.TicketResponse) #ตรวจสอบตอนส่งกลับ
@@ -34,3 +35,58 @@ def get_tickets(status: Optional[schemas.TicketStatus] = None, db: Session= Depe
 
     tickets = query.all() #ดึงข้อมูลออกมา
     return tickets
+
+#user update ticket ตอน pending เท่านั้น
+@router.put("/tickets/{ticket_id}", response_model=schemas.TicketResponse)
+def update_tickets(ticket_id: UUID, ticket_update: schemas.TicketUpdate, 
+                   db:Session=Depends(get_db)):
+    db_ticket = db.query(models.Ticket).filter(models.Ticket.id==ticket_id).first()
+    if not db_ticket:
+        raise HTTPException(status_code=404, detail="Ticket Not Found!")
+    update_data = ticket_update.model_dump(exclude_unset=True)
+    if db_ticket.status != schemas.TicketStatus.pending:
+        raise HTTPException(status_code=400, detail="Ticket not in pending!")
+    #มันจะไปหาตัวแปรใน db_ticket ที่ชื่อตรงกับ key แล้วเปลี่ยนค่าให้เป็น value
+    for key, value in update_data.items():
+        if isinstance(value, enum.Enum):
+            value = value.value #.value แปลงเป็น string
+        setattr(db_ticket,key,value)
+
+    db.commit()
+    db.refresh(db_ticket)
+
+    return db_ticket
+
+#admin accept ticket
+@router.patch("/tickets/{ticket_id}/{status}", response_model=schemas.TicketResponse)
+def update_status(ticket_id: UUID, new_status: schemas.TicketStatus,
+                  db: Session=Depends(get_db)):
+    db_ticket = db.query(models.Ticket).filter(models.Ticket.id==ticket_id).first()
+    if not db_ticket:
+        raise HTTPException(status_code=404, detail="Ticket Not Found!")
+    current_status = db_ticket.status
+
+    #จะเปลี่ยนเป็นสถานะเดิมไม่ได้
+    if new_status.value == current_status:
+        raise HTTPException(status_code=400, detail=f"Ticket is already {current_status}")
+    #จบไปแล้วจะเปลี่ยนไม่ได้
+    if current_status in [models.TicketStatus.resolved, models.TicketStatus.rejected]:
+        raise HTTPException(status_code=400, detail="Cannot update a closed ticket!")
+    #จะ acceptได้ ค่าใน db ต้อง pending ก่อนเสมอ
+    if new_status.value == models.TicketStatus.accepted:
+        if current_status != models.TicketStatus.pending:
+            raise HTTPException(status_code=400, detail=f"Must be pending before accepting (Current: {current_status})")
+    #จะ จบticketได้ข้างในต้องเป็น accepted เสมอ
+    elif new_status.value in [models.TicketStatus.rejected, models.TicketStatus.resolved]:
+        if current_status != models.TicketStatus.accepted:
+            raise HTTPException(status_code=400, detail="Must be accepted before closing")
+            
+    #ห้ามเปลี่ยน status กลับเป็น pending
+    elif new_status.value == models.TicketStatus.pending:
+         raise HTTPException(status_code=400, detail="Cannot move ticket back to pending")
+    
+    db_ticket.status = new_status.value
+    db.commit()
+    db.refresh(db_ticket)
+
+    return db_ticket    

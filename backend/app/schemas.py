@@ -26,7 +26,6 @@ class TicketUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     contact_info: Optional[str] = None
-    status: Optional[TicketStatus] = None
 
 # res ticketไปให้user
 class TicketResponse(TicketBase):
@@ -37,3 +36,9 @@ class TicketResponse(TicketBase):
 
     class Config:
         from_attributes = True
+
+class TicketUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    contact_info: Optional[str] = None
+    status: Optional[TicketStatus] = None
