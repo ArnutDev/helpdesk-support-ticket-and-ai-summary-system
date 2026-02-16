@@ -58,14 +58,14 @@ def update_tickets(ticket_id: UUID, ticket_update: schemas.TicketUpdate,
     return db_ticket
 
 #admin accept ticket
-@router.patch("/tickets/{ticket_id}/{status}", response_model=schemas.TicketResponse)
+@router.patch("/tickets/{ticket_id}/status", response_model=schemas.TicketResponse)
 def update_status(ticket_id: UUID, new_status: schemas.TicketStatus,
                   db: Session=Depends(get_db)):
     db_ticket = db.query(models.Ticket).filter(models.Ticket.id==ticket_id).first()
     if not db_ticket:
         raise HTTPException(status_code=404, detail="Ticket Not Found!")
     current_status = db_ticket.status
-
+    print(new_status)
     #จะเปลี่ยนเป็นสถานะเดิมไม่ได้
     if new_status.value == current_status:
         raise HTTPException(status_code=400, detail=f"Ticket is already {current_status}")
