@@ -4,6 +4,12 @@ import api from "../services/api";
 export default function AdminDashboard() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState("all");
+  const displayTickets = tickets.filter((ticket) => {
+    if (filterStatus === "all") return true;
+    return ticket.status === filterStatus;
+  });
+  const statuses = ["all", "pending", "accepted", "resolved", "rejected"];
   const fetchAllTickets = async () => {
     try {
       const response = await api.get("/tickets");
@@ -27,20 +33,43 @@ export default function AdminDashboard() {
   };
   if (loading)
     return (
-      <div className="p-10 text-center">กำลังโหลดข้อมูลเจ้าหน้าที่...</div>
+      <div className="p-10 text-center text-white">
+        กำลังโหลดข้อมูลเจ้าหน้าที่...
+      </div>
     );
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-10">
         <div>
-          <h1 className="text-3xl font-black text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-500">จัดการรายการแจ้งซ่อมและสถานะงาน</p>
+          <h1 className="text-3xl font-black text-white">Admin Dashboard</h1>
+          <p className="text-gray-200">จัดการรายการแจ้งซ่อมและสถานะงาน</p>
         </div>
-        <div className="bg-blue-50 px-4 py-2 rounded-lg text-blue-700 font-bold">
+        <div className="bg-gray-100 px-4 py-2 rounded-lg text-blue-700 font-bold">
           Total: {tickets.length} Tickets
         </div>
       </div>
-
+      <div className="flex space-x-2 mb-6 bg-gray-100 p-1.5 rounded-2xl w-fit">
+        {statuses.map((status) => (
+          <button
+            key={status}
+            onClick={() => setFilterStatus(status)} // เมื่อคลิก ให้เปลี่ยนค่าใน State
+            className={`px-5 py-2 rounded-xl text-xs font-bold uppercase transition-all 
+          ${
+            filterStatus === status
+              ? "bg-white text-blue-600 shadow-md" // สไตล์ตอนเลือก
+              : "text-gray-500 hover:text-gray-700" // สไตล์ตอนไม่ได้เลือก
+          }`}
+          >
+            {status}
+          </button>
+        ))}
+        <button
+          onClick={fetchAllTickets} // เรียกฟังก์ชันเดิมที่เรามีอยู่แล้ว
+          className="flex items-center gap-2 text-sm bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg"
+        >
+          🔄
+        </button>
+      </div>
       <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
@@ -57,7 +86,7 @@ export default function AdminDashboard() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {tickets.map((t) => (
+            {displayTickets.map((t) => (
               <tr key={t.id} className="hover:bg-blue-50/30 transition-colors">
                 <td className="p-6">
                   <div className="font-bold text-gray-800 text-lg">

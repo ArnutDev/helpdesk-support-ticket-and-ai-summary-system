@@ -20,10 +20,10 @@ export default function Home() {
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-black text-gray-900">MY TICKETS</h1>
+        <h1 className="text-2xl font-black text-white">MY TICKETS</h1>
         <button
           onClick={() => setIsModalOpen(true)} // กดแล้วเปิด Modal
-          className="bg-black text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-800"
+          className="bg-white text-black px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200"
         >
           + แจ้งเรื่องใหม่
         </button>
