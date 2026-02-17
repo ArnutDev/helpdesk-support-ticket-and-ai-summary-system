@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from app.database import engine, Base
-from app.api import tickets
+from app.api import tickets,auth
+
 from fastapi.middleware.cors import CORSMiddleware
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Helpdesk Ticket API")
@@ -16,7 +18,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(tickets.router, prefix="/api", tags=["Tickets"])
+app.include_router(tickets.router)
+app.include_router(auth.router)
 
 @app.get("/")
 def root():

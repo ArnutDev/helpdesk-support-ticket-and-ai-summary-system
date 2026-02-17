@@ -3,6 +3,7 @@ import enum
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+from pydantic import BaseModel
 
 # status
 class TicketStatus(enum.Enum):
@@ -42,3 +43,11 @@ class TicketUpdate(BaseModel):
     description: Optional[str] = None
     contact_info: Optional[str] = None
     status: Optional[TicketStatus] = None
+
+class CreateUserRequest(BaseModel):
+    username:str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

@@ -2,10 +2,12 @@ from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 from app import models, schemas
 from app.database import get_db
+from app.api.auth import get_current_user
 from typing import List, Optional
+
 from uuid import UUID
 import enum
-router = APIRouter()
+router = APIRouter(prefix="/api", tags=["Tickets"])
 
 @router.post("/tickets",response_model=schemas.TicketResponse) #ตรวจสอบตอนส่งกลับ
 def create_ticket(ticket: schemas.TicketCreate,
@@ -60,25 +62,26 @@ def update_tickets(ticket_id: UUID, ticket_update: schemas.TicketUpdate,
 #admin accept ticket
 @router.patch("/tickets/{ticket_id}/status", response_model=schemas.TicketResponse)
 def update_status(ticket_id: UUID, new_status: schemas.TicketStatus,
-                  db: Session=Depends(get_db)):
+                  db: Session=Depends(get_db),
+                  current_user: dict = Depends(get_current_user)):
     db_ticket = db.query(models.Ticket).filter(models.Ticket.id==ticket_id).first()
     if not db_ticket:
         raise HTTPException(status_code=404, detail="Ticket Not Found!")
-    current_status = db_ticket.status
+    current_status_val = db_ticket.status.value if hasattr(db_ticket.status, 'value') else db_ticket.status
     print(new_status)
     #จะเปลี่ยนเป็นสถานะเดิมไม่ได้
-    if new_status.value == current_status:
-        raise HTTPException(status_code=400, detail=f"Ticket is already {current_status}")
+    if new_status.value == current_status_val:
+        raise HTTPException(status_code=400, detail=f"Ticket is already {current_status_val}")
     #จบไปแล้วจะเปลี่ยนไม่ได้
-    if current_status in [models.TicketStatus.resolved, models.TicketStatus.rejected]:
+    if current_status_val in [models.TicketStatus.resolved, models.TicketStatus.rejected]:
         raise HTTPException(status_code=400, detail="Cannot update a closed ticket!")
     #จะ acceptได้ ค่าใน db ต้อง pending ก่อนเสมอ
     if new_status.value == models.TicketStatus.accepted:
-        if current_status != models.TicketStatus.pending:
-            raise HTTPException(status_code=400, detail=f"Must be pending before accepting (Current: {current_status})")
+        if current_status_val != models.TicketStatus.pending:
+            raise HTTPException(status_code=400, detail=f"Must be pending before accepting (Current: {current_status_val})")
     #จะ จบticketได้ข้างในต้องเป็น accepted เสมอ
     elif new_status.value in [models.TicketStatus.rejected, models.TicketStatus.resolved]:
-        if current_status != models.TicketStatus.accepted:
+        if current_status_val != models.TicketStatus.accepted:
             raise HTTPException(status_code=400, detail="Must be accepted before closing")
             
     #ห้ามเปลี่ยน status กลับเป็น pending
