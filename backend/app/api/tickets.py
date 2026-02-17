@@ -7,7 +7,7 @@ from typing import List, Optional
 
 from uuid import UUID
 import enum
-router = APIRouter(prefix="/api", tags=["Tickets"])
+router = APIRouter(prefix="", tags=["Tickets"])
 
 @router.post("/tickets",response_model=schemas.TicketResponse) #ตรวจสอบตอนส่งกลับ
 def create_ticket(ticket: schemas.TicketCreate,

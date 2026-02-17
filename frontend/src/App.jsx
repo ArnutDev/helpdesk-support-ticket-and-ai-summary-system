@@ -3,12 +3,16 @@ import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 
-const ProtectedRoute = ({ children }) => {
-  const isAdmin = localStorage.getItem("isAdmin") === "true";
-
-  if (!isAdmin) {
+const RoleProtectedRoute = ({ children, allowedRole }) => {
+  const token = localStorage.getItem("token");
+  const userRole = localStorage.getItem("role");
+  if (!token) {
     // ถ้าไม่ใช่ Admin ให้ดีดไปหน้า Login ทันที
     return <Navigate to="/login" replace />;
+  }
+  if (userRole !== allowedRole) {
+    // ถ้า role ไม่ตรง ให้ดีดกลับไปหน้าของตัวเอง
+    return <Navigate to={userRole === "admin" ? "/admin" : "/"} replace />;
   }
 
   // ถ้าใช่ Admin ให้แสดงหน้า Dashboard (children)
@@ -20,13 +24,20 @@ function App() {
     <div className="min-h-screen bg-[#343541]">
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <RoleProtectedRoute allowedRole="user">
+                <Home />
+              </RoleProtectedRoute>
+            }
+          />
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+              <RoleProtectedRoute allowedRole="admin">
                 <AdminDashboard />
-              </ProtectedRoute>
+              </RoleProtectedRoute>
             }
           />
           <Route path="/login" element={<Login />} />
