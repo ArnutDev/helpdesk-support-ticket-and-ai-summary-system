@@ -35,4 +35,4 @@ def root():
 
 # ตั้งuser ให้เป็น admin
 # สมัครปกติก่อน แล้วค่อย
-# docker exec -it helpdesk-postgres psql -U postgres -d postgres -c "UPDATE users SET role = 'admin' WHERE username = 'ใส่ username'"
+# docker exec -it helpdesk-postgres psql -U postgres -d helpdesk_db -c "UPDATE users SET role = 'admin' WHERE username = 'ชื่อที่คุณสมัคร';"
