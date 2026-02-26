@@ -1,15 +1,52 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
+import Register from "./pages/Register";
+
+import AdminDashboard from "./pages/AdminDashboard";
+import Login from "./pages/Login";
+
+const RoleProtectedRoute = ({ children, allowedRole }) => {
+  const token = localStorage.getItem("token");
+  const userRole = localStorage.getItem("role");
+  if (!token) {
+    // ถ้าไม่ใช่ Admin ให้ดีดไปหน้า Login ทันที
+    return <Navigate to="/login" replace />;
+  }
+  if (userRole !== allowedRole) {
+    // ถ้า role ไม่ตรง ให้ดีดกลับไปหน้าของตัวเอง
+    return <Navigate to={userRole === "admin" ? "/admin" : "/"} replace />;
+  }
+
+  // ถ้าใช่ Admin ให้แสดงหน้า Dashboard (children)
+  return children;
+};
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
-      <h1 class="text-3xl font-bold underline">Hello world!</h1>
-    </>
+    <div className="min-h-screen bg-[#343541]">
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <RoleProtectedRoute allowedRole="user">
+                <Home />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <RoleProtectedRoute allowedRole="admin">
+                <AdminDashboard />
+              </RoleProtectedRoute>
+            }
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 

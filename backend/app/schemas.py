@@ -3,7 +3,8 @@ import enum
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
-
+from pydantic import BaseModel
+import uuid
 # status
 class TicketStatus(enum.Enum):
     pending = "pending"
@@ -26,14 +27,28 @@ class TicketUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     contact_info: Optional[str] = None
-    status: Optional[TicketStatus] = None
 
 # res ticketไปให้user
 class TicketResponse(TicketBase):
-    id: UUID
+    id: uuid.UUID
     status: TicketStatus
     created_at: datetime
     updated_at: datetime
-
+    owner_id: uuid.UUID
     class Config:
         from_attributes = True
+
+class TicketUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    contact_info: Optional[str] = None
+    status: Optional[TicketStatus] = None
+
+class CreateUserRequest(BaseModel):
+    username:str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    role: str

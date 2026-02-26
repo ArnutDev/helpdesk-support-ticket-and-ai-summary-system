@@ -36,5 +36,5 @@ The system uses a relational model with a **One-to-Many** relationship:
 
 1. **Clone the project:**
    ```bash
-   git clone [https://github.com/your-username/helpdesk-support-ticket.git](https://github.com/your-username/helpdesk-support-ticket.git)
+   git clone [https://github.com/ArnutDev/helpdesk-support-ticket.git](https://github.com/ArnutDev/helpdesk-support-ticket.git)
    ```
