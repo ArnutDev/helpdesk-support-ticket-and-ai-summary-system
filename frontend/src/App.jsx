@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
+import Register from "./pages/Register";
+
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 
@@ -41,6 +43,7 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </BrowserRouter>
     </div>

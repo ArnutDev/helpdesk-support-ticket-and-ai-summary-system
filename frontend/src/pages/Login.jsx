@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -13,7 +13,7 @@ export default function Login() {
     formData.append("password", password);
 
     try {
-      const response = await api.post("/auth/token", formData);
+      const response = await api.post("/auth/login", formData);
       const { access_token, role } = response.data;
       // เก็บ Token ที่ได้จากหลังบ้านลงเครื่อง
       localStorage.setItem("token", access_token);
@@ -64,6 +64,14 @@ export default function Login() {
         <button className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700">
           เข้าสู่ระบบ
         </button>
+        <div className="mt-4 text-center">
+          <Link
+            to="/register"
+            className="text-sm text-blue-600 hover:underline"
+          >
+            ยังไม่มีบัญชี? สมัครสมาชิก
+          </Link>
+        </div>
       </form>
     </div>
   );

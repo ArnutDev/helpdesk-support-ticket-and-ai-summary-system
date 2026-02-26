@@ -21,9 +21,7 @@ export default function TicketForm({ onClose, onRefresh }) {
   };
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      {/* Modal Container */}
       <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform transition-all">
-        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-black text-gray-800">แจ้งเรื่องใหม่</h2>
           <button
@@ -47,9 +45,7 @@ export default function TicketForm({ onClose, onRefresh }) {
           </button>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Title Input */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">
               หัวข้อปัญหา
@@ -65,7 +61,6 @@ export default function TicketForm({ onClose, onRefresh }) {
             />
           </div>
 
-          {/* Description Input */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">
               รายละเอียด
@@ -80,7 +75,6 @@ export default function TicketForm({ onClose, onRefresh }) {
             />
           </div>
 
-          {/* Contact Info Input */}
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">
               ข้อมูลติดต่อ
@@ -96,7 +90,6 @@ export default function TicketForm({ onClose, onRefresh }) {
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"

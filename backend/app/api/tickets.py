@@ -11,13 +11,16 @@ router = APIRouter(prefix="", tags=["Tickets"])
 
 @router.post("/tickets",response_model=schemas.TicketResponse) #ตรวจสอบตอนส่งกลับ
 def create_ticket(ticket: schemas.TicketCreate,
-                  db: Session= Depends(get_db)):#ตรวจสอบตอนรับเข้ามา
+                  db: Session= Depends(get_db),
+                  current_user: dict = Depends(get_current_user)):#ตรวจสอบตอนรับเข้ามา
     # แปลงใส่ model db
     db_ticket = models.Ticket(
-        title=ticket.title,
-        description=ticket.description,
-        contact_info=ticket.contact_info
+        # title=ticket.title,
+        # description=ticket.description,
+        # contact_info=ticket.contact_info,
+        **ticket.model_dump(),#ใช้ model_dump แทนข้างบน
         # status, timestamp ใส่ auto
+        owner_id=current_user['id']
     )
     # บันทึก
     db.add(db_ticket)
@@ -27,8 +30,13 @@ def create_ticket(ticket: schemas.TicketCreate,
     return db_ticket
 
 @router.get("/tickets", response_model=List[schemas.TicketResponse])#กำหนดรูปแบบ เอามาเป็น list ของ ticketResponse
-def get_tickets(status: Optional[schemas.TicketStatus] = None, db: Session= Depends(get_db)):# ตรวจด้วย ticketStatus หรือไม่มีก็ได้
+def get_tickets(status: Optional[schemas.TicketStatus] = None, 
+                db: Session= Depends(get_db),
+                current_user: dict = Depends(get_current_user)):# ตรวจด้วย ticketStatus หรือไม่มีก็ได้
     query = db.query(models.Ticket) #ดึงจาก table Ticket
+
+    if current_user['role'] != "admin":
+        query = query.filter(models.Ticket.owner_id == current_user['id'])
 
     if status: #ถ้าให้ filter statusมา
         query = query.filter(models.Ticket.status == status.value)# .value เพื่อแปลงstatusที่ส่งมาจาก objectเป็นstring
@@ -68,7 +76,7 @@ def update_status(ticket_id: UUID, new_status: schemas.TicketStatus,
     if not db_ticket:
         raise HTTPException(status_code=404, detail="Ticket Not Found!")
     current_status_val = db_ticket.status.value if hasattr(db_ticket.status, 'value') else db_ticket.status
-    print(new_status)
+    # print(new_status)
     #จะเปลี่ยนเป็นสถานะเดิมไม่ได้
     if new_status.value == current_status_val:
         raise HTTPException(status_code=400, detail=f"Ticket is already {current_status_val}")

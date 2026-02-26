@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 from pydantic import BaseModel
-
+import uuid
 # status
 class TicketStatus(enum.Enum):
     pending = "pending"
@@ -30,11 +30,11 @@ class TicketUpdate(BaseModel):
 
 # res ticketไปให้user
 class TicketResponse(TicketBase):
-    id: UUID
+    id: uuid.UUID
     status: TicketStatus
     created_at: datetime
     updated_at: datetime
-
+    owner_id: uuid.UUID
     class Config:
         from_attributes = True
 

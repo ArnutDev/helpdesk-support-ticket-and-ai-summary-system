@@ -28,3 +28,11 @@ def root():
 #docker stop helpdesk-postgres
 #.venv\Scripts\activate
 #uvicorn app.main:app --reload
+
+# login admin
+# username: admin
+# password: 123
+
+# ตั้งuser ให้เป็น admin
+# สมัครปกติก่อน แล้วค่อย
+# docker exec -it helpdesk-postgres psql -U postgres -d postgres -c "UPDATE users SET role = 'admin' WHERE username = 'ใส่ username'"
