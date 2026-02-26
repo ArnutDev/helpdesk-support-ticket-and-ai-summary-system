@@ -1,40 +1,37 @@
-# Helpdesk Support Ticket System
+# 🎫 Helpdesk Support Ticket Management System
 
-A professional Full-stack Support Ticket Management System built with **FastAPI** (Python) and **React**. This project implements modern web development standards including secure authentication, containerization, and role-based data isolation.
+A professional Full-stack Support Ticket System designed for efficient issue tracking and resolution. Built with **FastAPI** (Python) and **React** (Vite), this project is fully containerized using **Docker Compose** for a "One-Command Setup" experience.
 
-## 🚀 Key Features
+---
 
-- **Authentication & Security:** Secure registration and login using JWT (JSON Web Tokens) and password hashing with `bcrypt`.
-- **Role-Based Access Control (RBAC):** Distinct workflows for **Users** (Submit/View own tickets) and **Admins** (Manage all system tickets).
-- **Data Isolation:** Implemented logic to ensure users can only access their personal data, preventing unauthorized data exposure.
-- **UUID Implementation:** Utilizes **UUID v4** for all primary and foreign keys instead of standard integers to prevent ID enumeration attacks.
-- **Interactive Dashboard:** A clean, responsive UI built with **Tailwind CSS** for real-time ticket status updates (Pending, Accepted, Resolved, Rejected).
+## 🌟 Key Features
+
+- **User Authentication:** Secure Login/Register with JWT (JSON Web Tokens).
+- **Ticket Management:** Users can create, view, and track their own tickets (UUID-based data isolation).
+- **Admin Dashboard:** Staff can manage ticket statuses (Pending, In Progress, Resolved) and see all global tickets.
+- **UUID Security:** Uses UUID v4 for all primary keys to prevent ID enumeration attacks.
+- **Responsive UI:** Modern design using Tailwind CSS, fully compatible with mobile and desktop.
+
+---
 
 ## 🛠️ Tech Stack
 
-### Backend (Core Logic)
+| Layer              | Technology                                              |
+| ------------------ | ------------------------------------------------------- |
+| **Backend**        | FastAPI (Python 3.11), SQLAlchemy, PostgreSQL, Pydantic |
+| **Frontend**       | React (Vite), Tailwind CSS, Axios, Lucide Icons         |
+| **Database**       | PostgreSQL 15                                           |
+| **Infrastructure** | Docker, Docker Compose                                  |
 
-- **FastAPI:** High-performance Python web framework.
-- **SQLAlchemy:** ORM for database interactions.
-- **PostgreSQL:** Relational database for persistent storage.
-- **Docker:** Containerized database environment for consistent development.
+---
 
-### Frontend (UI/UX)
+## 🚀 Quick Start (Running with Docker)
 
-- **React (Vite):** Modern frontend library for a fast user experience.
-- **Tailwind CSS:** Utility-first CSS framework for rapid styling.
-- **Axios:** Configured with Interceptors to handle global Authentication headers and 401 Unauthorized responses.
+You can get the entire system up and running with just **one command**.
 
-## 🏗️ Database Schema
+### 1. Clone the repository
 
-The system uses a relational model with a **One-to-Many** relationship:
-
-- **Users Table:** Stores hashed credentials, usernames, and roles.
-- **Tickets Table:** Stores ticket details, linked to the `users` table via `owner_id` (UUID).
-
-## 🔧 Installation & Setup
-
-1. **Clone the project:**
-   ```bash
-   git clone [https://github.com/ArnutDev/helpdesk-support-ticket.git](https://github.com/ArnutDev/helpdesk-support-ticket.git)
-   ```
+```bash
+git clone [https://github.com/your-username/helpdesk-support-ticket.git](https://github.com/your-username/helpdesk-support-ticket.git)
+cd helpdesk-support-ticket
+```
