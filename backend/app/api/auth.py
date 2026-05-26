@@ -24,9 +24,9 @@ db_dependency = Annotated[Session, Depends(get_db)]
 @router.post("/register",status_code=status.HTTP_201_CREATED)#register
 async def create_user(db: Annotated[Session, Depends(get_db)], create_user_request: CreateUserRequest):
     
-    existing_user = db.query(User).filter(User.username == create_user_request.username).first()
+    existing_user = db.query(User).filter(User.email == create_user_request.email).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Username already exists")
+        raise HTTPException(status_code=400, detail="Email already exists")
 
     password_bytes = create_user_request.password.encode('utf-8')
     salt = bcrypt.gensalt()
@@ -34,6 +34,7 @@ async def create_user(db: Annotated[Session, Depends(get_db)], create_user_reque
 
     create_user_model = User(
         username=create_user_request.username,
+        email=create_user_request.email,
         hashed_password=hashed_password.decode('utf-8'),
         role="user"
     )
@@ -46,15 +47,15 @@ async def create_user(db: Annotated[Session, Depends(get_db)], create_user_reque
 async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
                                  db: db_dependency):
     
-    user = authenticate_user(form_data.username, form_data.password, db)
+    user = authenticate_user(form_data.username, form_data.password, db) #form_data.username = email
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Could not validate user')
 
     token = create_access_token(user.username,user.id, user.role, timedelta(minutes=20))
     return {'access_token':token, 'token_type': 'bearer','role': user.role}
 
-def authenticate_user(username: str, password: str, db):
-    user = db.query(User).filter(User.username == username).first()
+def authenticate_user(email: str, password: str, db):
+    user = db.query(User).filter(User.email == email).first()
     if not user:
         return False
     if not bcrypt.checkpw(password.encode('utf-8'), user.hashed_password.encode('utf-8')):

@@ -4,7 +4,9 @@ import api from "../services/api";
 
 export default function Register() {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -15,7 +17,9 @@ export default function Register() {
     try {
       await api.post("/auth/register", {
         username: username,
+        email: email,
         password: password,
+        confirm_password: confirmPassword
       });
 
       alert("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ");
@@ -51,11 +55,29 @@ export default function Register() {
         />
 
         <input
+          type="email"
+          placeholder="Email"
+          className="w-full mb-4 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
           type="password"
           placeholder="Password"
           className="w-full mb-6 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Confirm Password"
+          className="w-full mb-6 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
 

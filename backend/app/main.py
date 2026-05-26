@@ -1,12 +1,22 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from app.database import engine, Base
 from app.api import tickets,auth
-
+from app.database import seed_admin
 from fastapi.middleware.cors import CORSMiddleware
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Helpdesk Ticket API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # โค้ดในบล็อกนี้จะทำงาน "ทันที" ที่เราพิมพ์ uvicorn สตาร์ทระบบ
+    print("เซิร์ฟเวอร์กำลังสตาร์ท...")
+    seed_admin() #เพิ่มแอดมินตอนเริ่มระบบ
+    yield
+    print("เซิร์ฟเวอร์กำลังปิดตัวลง...")
+
+app = FastAPI(lifespan=lifespan, title="Helpdesk Ticket API")
+
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -28,11 +38,3 @@ def root():
 #docker stop helpdesk-postgres
 #.venv\Scripts\activate
 #uvicorn app.main:app --reload
-
-# login admin
-# username: admin
-# password: 123
-
-# ตั้งuser ให้เป็น admin
-# สมัครปกติก่อน แล้วค่อย
-# docker exec -it helpdesk-postgres psql -U postgres -d helpdesk_db -c "UPDATE users SET role = 'admin' WHERE username = 'ชื่อที่คุณสมัคร';"
