@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import ManageRole from "../components/ManageRole";
 
 export default function AdminDashboard() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const displayTickets = tickets.filter((ticket) => {
@@ -26,7 +28,6 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -68,6 +69,12 @@ export default function AdminDashboard() {
           <div className="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-white border border-white/20 font-bold">
             Total: {tickets.length} Tickets
           </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-white text-black px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200"
+          >
+            Manage Role
+          </button>
           {/*Logout */}
           <button
             onClick={handleLogout}
@@ -200,6 +207,11 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+      {isModalOpen && (
+        <ManageRole
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

@@ -16,5 +16,22 @@ api.interceptors.request.use(
     }
 );
 
+api.interceptors.response.use(
+  (response) => response, // ถ้าทำงานปกติ (สเตตัส 200) ปล่อยผ่านไปตามปกติ
+  (error) => {
+    // เช็คว่าถ้า Error เกิดจากระบบสิทธิ์ (401=กุญแจหมดอายุ, 403=สิทธิ์ไม่ถึง/โดนปลด)
+    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+      
+      // ล้างข้อมูลเซสชัน
+      localStorage.removeItem("token");
+      localStorage.removeItem("role"); 
+      
+      alert(error.response.data?.detail || "เซสชันหมดอายุหรือสิทธิ์ถูกเปลี่ยนแปลง กรุณาเข้าสู่ระบบใหม่");
 
+      window.location.href = "/login"; 
+    }
+    
+    return Promise.reject(error);
+  }
+);
 export default api;

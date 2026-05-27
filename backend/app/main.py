@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.database import engine, Base
-from app.api import tickets,auth
+from app.api import tickets,auth,users
 from app.database import seed_admin
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -30,6 +30,7 @@ app.add_middleware(
 )
 app.include_router(tickets.router)
 app.include_router(auth.router)
+app.include_router(users.router)
 
 @app.get("/")
 def root():

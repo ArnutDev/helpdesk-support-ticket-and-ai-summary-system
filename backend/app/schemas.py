@@ -64,3 +64,16 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     role: str
+
+class RoleUpdate(BaseModel):
+    new_role: str
+    user_id: uuid.UUID
+
+class UserOut(BaseModel):
+    id: uuid.UUID
+    username: str
+    email: EmailStr
+    role: str
+
+    class Config:
+        from_attributes = True
