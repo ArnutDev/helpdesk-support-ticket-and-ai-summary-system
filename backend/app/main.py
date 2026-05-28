@@ -1,3 +1,4 @@
+from app.api import summary
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.database import engine, Base
@@ -31,6 +32,7 @@ app.add_middleware(
 app.include_router(tickets.router)
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(summary.router)
 
 @app.get("/")
 def root():

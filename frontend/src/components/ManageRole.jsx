@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
 
-export default function TicketForm({ onClose, onRefresh }) {
+export default function ManageRole({ onClose, onRefresh }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 

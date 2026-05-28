@@ -16,7 +16,7 @@ router = APIRouter(prefix='/auth',tags=['auth'])
 SECRET_KEY = 'yahoo888'
 ALGORITHM = 'HS256'
 
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/login')
 
 
 db_dependency = Annotated[Session, Depends(get_db)]
