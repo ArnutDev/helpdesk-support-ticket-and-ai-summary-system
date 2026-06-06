@@ -33,15 +33,20 @@ def get_all_users(db: Session = Depends(get_db), admin: User = Depends(require_a
     return summary_result
 
 def summary_by_llm(ticket_lists: List[Ticket]):
+    seven_days_ago = datetime.now() - timedelta(days=7)
+    filtered_tickets = [
+        t for t in ticket_lists 
+        if t.created_at >= seven_days_ago
+    ]
     context = ""
-    for ticket in ticket_lists:
+    for ticket in filtered_tickets:
         context += f"วัน-เวลา: {ticket.created_at}\nหัวเรื่อง ticket: {ticket.title}\nเนื้อหา ticket: {ticket.description}\nสถานะ ticket: {ticket.status.value}\n------------------------------\n"
     
     print(context)
-    resolved_count = len([t for t in ticket_lists if t.status.value == "resolved"])
-    rejected_count = len([t for t in ticket_lists if t.status.value == "rejected"])
-    pending_accepted_count = len([t for t in ticket_lists if t.status.value in ["pending", "accepted"]])
-    total_count = len(ticket_lists)
+    resolved_count = len([t for t in filtered_tickets if t.status.value == "resolved"])
+    rejected_count = len([t for t in filtered_tickets if t.status.value == "rejected"])
+    pending_accepted_count = len([t for t in filtered_tickets if t.status.value in ["pending", "accepted"]])
+    total_count = len(filtered_tickets)
 
     system_prompt = f"""
     คุณเป็นสรุปข้อมูล IT Support เจนสรุปรายงานประจำสัปดาห์จากข้อมูล Ticket ทั้งหมด 7 วันล่าสุด
@@ -85,3 +90,4 @@ def summary_by_llm(ticket_lists: List[Ticket]):
     ).choices[0].message.content
     print("LLM Response:", response)
     return {"summary": response}
+    # return total_count

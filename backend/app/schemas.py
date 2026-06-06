@@ -35,7 +35,7 @@ class TicketResponse(TicketBase):
     created_at: datetime
     updated_at: datetime
     owner_id: uuid.UUID
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 class TicketUpdate(BaseModel):
@@ -75,5 +75,5 @@ class UserOut(BaseModel):
     email: EmailStr
     role: str
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
