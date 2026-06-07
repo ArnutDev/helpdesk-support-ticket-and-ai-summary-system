@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field, model_validator
 import enum
 from datetime import datetime
 from typing import Optional
@@ -35,7 +35,7 @@ class TicketResponse(TicketBase):
     created_at: datetime
     updated_at: datetime
     owner_id: uuid.UUID
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 class TicketUpdate(BaseModel):
@@ -45,10 +45,35 @@ class TicketUpdate(BaseModel):
     status: Optional[TicketStatus] = None
 
 class CreateUserRequest(BaseModel):
-    username:str
+    username:str = Field(..., min_length=2, max_length=50, description="ชื่อผู้ใช้หรือชื่อแสดงตัวตน")
+    email: EmailStr = Field(..., description="อีเมลของผู้ใช้")
+    password: str = Field(..., min_length=8, description="รหัสผ่านของผู้ใช้อย่างน้อย 8 ตัวอักษร")
+    confirm_password: str
+
+    @model_validator(mode='after')
+    def verify_password_match(self):
+        if self.password != self.confirm_password:
+            raise ValueError("รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน")
+        return self
+
+class UserLogin(BaseModel):
+    email: EmailStr
     password: str
 
 class Token(BaseModel):
     access_token: str
     token_type: str
     role: str
+
+class RoleUpdate(BaseModel):
+    new_role: str
+    user_id: uuid.UUID
+
+class UserOut(BaseModel):
+    id: uuid.UUID
+    username: str
+    email: EmailStr
+    role: str
+
+    class ConfigDict:
+        from_attributes = True

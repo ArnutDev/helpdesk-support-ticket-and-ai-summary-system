@@ -2,14 +2,14 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 export default function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     const formData = new URLSearchParams();
-    formData.append("username", username);
+    formData.append("username", email);
     formData.append("password", password);
 
     try {
@@ -50,10 +50,10 @@ export default function Login() {
       >
         <h2 className="text-2xl font-black mb-6 text-center">LOGIN</h2>
         <input
-          type="text"
-          placeholder="Username"
+          type="email"
+          placeholder="Email"
           className="w-full mb-4 p-3 border rounded-xl"
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
