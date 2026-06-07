@@ -7,10 +7,7 @@ from fastapi import HTTPException
 from app.models import User
 from app.api.auth import create_access_token, get_current_user, require_admin
 
-# ==========================================
-# 🔐 1. เทสระบบสมัครสมาชิก (Register)
-# ==========================================
-
+# เทสระบบสมัครสมาชิก (Register)
 def test_register_user_successfully(client):
     payload = {
         "username": "arnut_dev",
@@ -44,10 +41,7 @@ def test_register_duplicate_email_should_fail(client, db_session):
     assert "Email already exists" in response.json()["detail"]
 
 
-# ==========================================
-# 🔑 2. เทสระบบเข้าสู่ระบบและการออก Token (Login)
-# ==========================================
-
+# 2. เทสระบบเข้าสู่ระบบและการออก Token (Login)
 def test_login_success_returns_token(client, db_session):
     raw_password = "password123"
     hashed = bcrypt.hashpw(raw_password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -74,10 +68,7 @@ def test_login_success_returns_token(client, db_session):
     assert json_data["role"] == "user"
 
 
-# ==========================================
-# 🛡️ 3. เทสระบบถอดรหัสและตรวจสิทธิ์ (JWT & Roles)
-# ==========================================
-
+#  3. เทสระบบถอดรหัสและตรวจสิทธิ์ (JWT & Roles)
 @pytest.mark.anyio
 async def test_get_current_user_valid_token():
     """แกะโทเค็นที่ถูกต้อง ข้อมูลต้องถอดออกมาครบถ้วน"""
@@ -102,10 +93,7 @@ async def test_get_current_user_invalid_token_should_raise_error():
     assert exc_info.value.detail == "Could not validate user"
 
 
-# ==========================================
-# 👑 4. ดักคอมาเฟีย แอบอ้างสิทธิ์ Admin (require_admin)
-# ==========================================
-
+#  4. ดักคอมาเฟีย แอบอ้างสิทธิ์ Admin (require_admin)
 def test_require_admin_with_normal_user_should_raise_forbidden(db_session):
     """ยูสเซอร์ทั่วไป แต่อยากห้าวมาเข้าประตูด่านแอดมิน โดนตบกลับด้วย 403"""
     user_id = uuid.uuid4()
