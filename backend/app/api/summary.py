@@ -8,7 +8,7 @@ from app.schemas import RoleUpdate, UserOut
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 router = APIRouter(prefix="/admin/tickets", tags=["Tickets Summary"])
 
@@ -21,7 +21,7 @@ llm = OpenAI(
 
 @router.get("/summary", response_model=None)
 def get_all_users(db: Session = Depends(get_db), admin: User = Depends(require_admin)):
-    now = datetime.now()
+    now = datetime.now(timezone.utc)
     seven_days_ago = now - timedelta(days=7)
     weekly_tickets = db.query(Ticket).filter(Ticket.created_at >= seven_days_ago).all()
     if not weekly_tickets:
@@ -33,7 +33,7 @@ def get_all_users(db: Session = Depends(get_db), admin: User = Depends(require_a
     return summary_result
 
 def summary_by_llm(ticket_lists: List[Ticket]):
-    seven_days_ago = datetime.now() - timedelta(days=7)
+    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
     filtered_tickets = [
         t for t in ticket_lists 
         if t.created_at >= seven_days_ago
