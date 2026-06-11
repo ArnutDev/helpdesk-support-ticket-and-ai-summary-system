@@ -1,0 +1,9 @@
+[[headers]]
+  for = "/assets/*.js" # หรือ "/frontend/dist/assets/*.js" ตามโครงสร้างที่ Vite บิวด์ออกมา
+  [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "/assets/*.mjs"
+  [headers.values]
+    Content-Type = "application/javascript"
