@@ -1,6 +1,8 @@
 # 🎫 Helpdesk Support Ticket & AI Summary System
 
-ระบบจัดการตั๋วแจ้งซ่อมและซัพพอร์ต (Helpdesk Support Ticket) พร้อมระบบคัดกรองสิทธิ์ (RBAC) พัฒนาในรูปแบบ Full-Stack Application รองรับการรันผ่าน Docker Compose
+ระบบจัดการตั๋วแจ้งซ่อมและซัพพอร์ต (Helpdesk Support Ticket) พร้อมระบบคัดกรองสิทธิ์ (RBAC) พัฒนาในรูปแบบ Full-Stack Application รองรับการรันผ่าน Docker Compose 
+
+- Live Website: [Helpdesk Support Ticket](https://helpdesk-support-ticket-and-ai-summ.vercel.app)
 
 ## 👥 User Roles & Permissions (การแบ่งสิทธิ์ผู้ใช้งาน)
 
