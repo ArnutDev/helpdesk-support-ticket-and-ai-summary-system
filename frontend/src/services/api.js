@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8000', // ตั้งค่า URL หลักของ Backend ไว้ที่นี่
+    baseURL: 'https://helpdesk-support-ticket-329813944956.asia-southeast1.run.app', // ตั้งค่า URL หลักของ Backend ไว้ที่นี่
 });
 api.interceptors.request.use(
     (config) => {
