@@ -225,7 +225,7 @@ export default function AdminDashboard() {
         />
       )}
 
-      /// สรุปข้อมูลด้วย AI Modal
+      {/* สรุปข้อมูลด้วย AI Modal */}
       {isSummaryModalOpen && (
        <SummaryTickets
           onClose={() => setIsSummaryModalOpen(false)}
