@@ -17,18 +17,20 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response, // ถ้าทำงานปกติ (สเตตัส 200) ปล่อยผ่านไปตามปกติ
+  (response) => response, 
   (error) => {
-    // เช็คว่าถ้า Error เกิดจากระบบสิทธิ์ (401=กุญแจหมดอายุ, 403=สิทธิ์ไม่ถึง/โดนปลด)
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       
-      // ล้างข้อมูลเซสชัน
+      const isLoginPage = window.location.pathname === '/login';
+
       localStorage.removeItem("token");
       localStorage.removeItem("role"); 
       
-      alert(error.response.data?.detail || "เซสชันหมดอายุหรือสิทธิ์ถูกเปลี่ยนแปลง กรุณาเข้าสู่ระบบใหม่");
+      alert(error.response.data?.detail || "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
 
-      window.location.href = "/login"; 
+      if (!isLoginPage) {
+        window.location.href = "/"; // สั่งกลับไปที่รากหลัก เพื่อให้ React Router คุมต่อ
+      }
     }
     
     return Promise.reject(error);
