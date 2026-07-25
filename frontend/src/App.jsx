@@ -23,7 +23,7 @@ const RoleProtectedRoute = ({ children, allowedRole }) => {
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#343541]">
+    <div className="min-h-screen bg-[#F1F5F9]">
       <BrowserRouter>
         <Routes>
           <Route

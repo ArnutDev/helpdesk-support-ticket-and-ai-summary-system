@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+console.log("VITE_API_URL loaded in frontend:", import.meta.env.VITE_API_URL);
+
 const api = axios.create({
-    baseURL: 'https://helpdesk-support-ticket-329813944956.asia-southeast1.run.app', // ตั้งค่า URL หลักของ Backend ไว้ที่นี่
+    baseURL: import.meta.env.VITE_API_URL, // ตั้งค่า URL หลักของ Backend ไว้ที่นี่
 });
 api.interceptors.request.use(
     (config) => {

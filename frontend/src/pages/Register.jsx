@@ -38,7 +38,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen w-full flex bg-[#F5F5F7] overflow-x-hidden font-sans">
+    <div className="min-h-screen w-full flex bg-[#F1F5F9] overflow-x-hidden font-sans">
       {/* Left panel: Branding and features (Hidden on mobile/tablet) */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-indigo-900 via-indigo-800 to-indigo-600 text-white p-16 flex-col justify-between relative overflow-hidden">
         {/* Decorative background blur objects */}
@@ -68,7 +68,7 @@ export default function Register() {
       </div>
 
       {/* Right panel: Register Form */}
-      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 md:p-16 bg-[#F5F5F7]">
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 md:p-16 bg-[#F1F5F9]">
         <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-2xl shadow-2xl shadow-slate-950/15 border border-slate-100 transition-all duration-200">
           
           <div className="text-center lg:text-left mb-8">
