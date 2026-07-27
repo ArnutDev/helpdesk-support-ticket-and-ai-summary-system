@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errors";
 
 export default function TicketForm({ onClose, onRefresh }) {
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ export default function TicketForm({ onClose, onRefresh }) {
         onClose();
       }
     } catch (error) {
-      alert(error.response?.data?.detail || "An error occurred while submitting the ticket.");
+      alert(getErrorMessage(error));
     } finally {
       setIsSubmitting(false);
     }

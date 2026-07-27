@@ -20,17 +20,22 @@ llm = OpenAI(
 )
 
 @router.get("/summary", response_model=None)
-def get_all_users(db: Session = Depends(get_db), admin: User = Depends(require_admin)):
+def get_ticket_summary(db: Session = Depends(get_db), admin: User = Depends(require_admin)):
     now = datetime.now(timezone.utc)
     seven_days_ago = now - timedelta(days=7)
     weekly_tickets = db.query(Ticket).filter(Ticket.created_at >= seven_days_ago).all()
     if not weekly_tickets:
-        raise HTTPException(status_code=404, detail="No tickets found in the last 7 days.")
+        raise HTTPException(status_code=404, detail="ไม่พบ Ticket ในช่วง 7 วันที่ผ่านมา")
     
-    # print(len(weekly_tickets))
-    summary_result = summary_by_llm(weekly_tickets)
-
-    return summary_result
+    try:
+        summary_result = summary_by_llm(weekly_tickets)
+        return summary_result
+    except Exception as e:
+        print(f"Error generating AI summary: {e}")
+        raise HTTPException(
+            status_code=502,
+            detail="เกิดข้อผิดพลาดในการสรุปรายงานด้วย AI โปรดตรวจสอบการเชื่อมต่อหรือ API Key"
+        )
 
 def summary_by_llm(ticket_lists: List[Ticket]):
     seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
