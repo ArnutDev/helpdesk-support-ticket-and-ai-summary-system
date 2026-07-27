@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errors";
 
 export default function ManageRole({ onClose, onRefresh }) {
   const [users, setUsers] = useState([]);
@@ -22,7 +23,7 @@ export default function ManageRole({ onClose, onRefresh }) {
       setUsers(response.data);
     } catch (error) {
       console.error("Fetch users error:", error);
-      alert(error.response?.data?.detail || "Could not retrieve user directory.");
+      alert(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -49,7 +50,7 @@ export default function ManageRole({ onClose, onRefresh }) {
         if (onRefresh) onRefresh();
       }
     } catch (error) {
-      alert(error.response?.data?.detail || "An error occurred while updating the role.");
+      alert(getErrorMessage(error));
     }
   };
 

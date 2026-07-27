@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errors";
 import ManageRole from "../components/ManageRole";
 import SummaryTickets from "../components/SummaryTickets";
 import TicketDetailModal from "../components/TicketDetailModal";
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
       });
       fetchAllTickets();
     } catch (error) {
-      alert(error.response?.data?.detail || "Update failed");
+      alert(getErrorMessage(error));
     }
   };
 

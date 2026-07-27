@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errors";
 
 export default function SummaryTickets({ onClose }) {
   const [summaryData, setSummaryData] = useState(null);
@@ -24,7 +25,7 @@ export default function SummaryTickets({ onClose }) {
       setSummaryData(response.data);
     } catch (error) {
       console.error("Fetch summary error:", error);
-      alert(error.response?.data?.detail || "Could not generate ticket summary.");
+      alert(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
