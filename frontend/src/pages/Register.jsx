@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errors";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -10,11 +11,37 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [validationErrors, setValidationErrors] = useState({});
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMsg("");
+    setValidationErrors({});
+
+    // Client-side validation
+    const newErrors = {};
+    if (username.trim().length < 2) {
+      newErrors.username = "ชื่อผู้ใช้ต้องมีอย่างน้อย 2 ตัวอักษร";
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      newErrors.email = "รูปแบบอีเมลไม่ถูกต้อง";
+    }
+    if (password.length < 8) {
+      newErrors.password = "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร";
+    }
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = "ยืนยันรหัสผ่านไม่ตรงกับรหัสผ่าน";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setValidationErrors(newErrors);
+      setLoading(false);
+      return;
+    }
 
     try {
       await api.post("/auth/register", {
@@ -24,17 +51,23 @@ export default function Register() {
         confirm_password: confirmPassword
       });
 
-      alert("Registration successful! Please sign in.");
+      alert("สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ");
       navigate("/login"); // Redirect to login page on success
     } catch (error) {
       console.error(error);
-      alert(
-        "Registration failed: " +
-          (error.response?.data?.detail || "Please try again"),
-      );
+      const parsedMsg = getErrorMessage(error);
+      setErrorMsg(parsedMsg);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInputChange = (field, value, setter) => {
+    setter(value);
+    if (validationErrors[field]) {
+      setValidationErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+    setErrorMsg("");
   };
 
   return (
@@ -71,16 +104,26 @@ export default function Register() {
       <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 md:p-16 bg-[#F1F5F9]">
         <div className="w-full max-w-md bg-white p-8 sm:p-10 rounded-2xl shadow-2xl shadow-slate-950/15 border border-slate-100 transition-all duration-200">
           
-          <div className="text-center lg:text-left mb-8">
+          <div className="text-center lg:text-left mb-6">
             <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">Create Account</h2>
             <p className="text-slate-500 mt-2 text-sm">Please sign up to get started</p>
           </div>
 
+          {/* Error Banner */}
+          {errorMsg && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-xs flex items-start space-x-2 animate-pulse">
+              <svg className="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div className="whitespace-pre-line">{errorMsg}</div>
+            </div>
+          )}
+
           <form onSubmit={handleRegister} className="space-y-4">
             
             {/* Username input field */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 block">Username</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-600 block">Username</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -92,15 +135,22 @@ export default function Register() {
                   placeholder="johndoe"
                   required
                   value={username}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-200"
-                  onChange={(e) => setUsername(e.target.value)}
+                  className={`w-full pl-11 pr-4 py-3 bg-slate-50 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-200 ${
+                    validationErrors.username 
+                      ? "border-red-300 focus:ring-red-500/25 focus:border-red-500" 
+                      : "border-slate-200 focus:ring-indigo-500/25 focus:border-indigo-500 focus:bg-white"
+                  }`}
+                  onChange={(e) => handleInputChange("username", e.target.value, setUsername)}
                 />
               </div>
+              {validationErrors.username && (
+                <p className="text-[11px] text-red-500 font-semibold mt-0.5">{validationErrors.username}</p>
+              )}
             </div>
 
             {/* Email input field */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 block">Email Address</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-600 block">Email Address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -112,15 +162,22 @@ export default function Register() {
                   placeholder="name@company.com"
                   required
                   value={email}
-                  className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-200"
-                  onChange={(e) => setEmail(e.target.value)}
+                  className={`w-full pl-11 pr-4 py-3 bg-slate-50 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-200 ${
+                    validationErrors.email 
+                      ? "border-red-300 focus:ring-red-500/25 focus:border-red-500" 
+                      : "border-slate-200 focus:ring-indigo-500/25 focus:border-indigo-500 focus:bg-white"
+                  }`}
+                  onChange={(e) => handleInputChange("email", e.target.value, setEmail)}
                 />
               </div>
+              {validationErrors.email && (
+                <p className="text-[11px] text-red-500 font-semibold mt-0.5">{validationErrors.email}</p>
+              )}
             </div>
 
             {/* Password input field */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 block">Password</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-600 block">Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -132,12 +189,16 @@ export default function Register() {
                   placeholder="••••••••"
                   required
                   value={password}
-                  className="w-full pl-11 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-200"
-                  onChange={(e) => setPassword(e.target.value)}
+                  className={`w-full pl-11 pr-12 py-3 bg-slate-50 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-200 ${
+                    validationErrors.password 
+                      ? "border-red-300 focus:ring-red-500/25 focus:border-red-500" 
+                      : "border-slate-200 focus:ring-indigo-500/25 focus:border-indigo-500 focus:bg-white"
+                  }`}
+                  onChange={(e) => handleInputChange("password", e.target.value, setPassword)}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -152,11 +213,14 @@ export default function Register() {
                   )}
                 </button>
               </div>
+              {validationErrors.password && (
+                <p className="text-[11px] text-red-500 font-semibold mt-0.5">{validationErrors.password}</p>
+              )}
             </div>
 
             {/* Confirm Password input field */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-semibold text-slate-700 block">Confirm Password</label>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-600 block">Confirm Password</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
@@ -168,12 +232,16 @@ export default function Register() {
                   placeholder="••••••••"
                   required
                   value={confirmPassword}
-                  className="w-full pl-11 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-white transition-all duration-200"
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={`w-full pl-11 pr-12 py-3 bg-slate-50 border rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-200 ${
+                    validationErrors.confirmPassword 
+                      ? "border-red-300 focus:ring-red-500/25 focus:border-red-500" 
+                      : "border-slate-200 focus:ring-indigo-500/25 focus:border-indigo-500 focus:bg-white"
+                  }`}
+                  onChange={(e) => handleInputChange("confirmPassword", e.target.value, setConfirmPassword)}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? (
@@ -188,6 +256,9 @@ export default function Register() {
                   )}
                 </button>
               </div>
+              {validationErrors.confirmPassword && (
+                <p className="text-[11px] text-red-500 font-semibold mt-0.5">{validationErrors.confirmPassword}</p>
+              )}
             </div>
 
             {/* Submit Button */}

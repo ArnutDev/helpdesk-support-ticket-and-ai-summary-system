@@ -22,15 +22,13 @@ api.interceptors.response.use(
   (response) => response, 
   (error) => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      
       const isLoginPage = window.location.pathname === '/login';
 
       localStorage.removeItem("token");
       localStorage.removeItem("role"); 
       
-      alert(error.response.data?.detail || "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
-
       if (!isLoginPage) {
+        alert(error.response.data?.detail || "เซสชันของคุณหมดอายุหรือสิทธิ์ไม่ถูกต้อง กรุณาเข้าสู่ระบบใหม่");
         window.location.href = "/"; // สั่งกลับไปที่รากหลัก เพื่อให้ React Router คุมต่อ
       }
     }
