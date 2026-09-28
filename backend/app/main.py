@@ -51,6 +51,7 @@ async def general_exception_handler(request: Request, exc: Exception):
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "https://helpdesk-frontend-web.vercel.app",
     "https://helpdesk-support-ticket-and-ai-summ.vercel.app"
 ]
 
