@@ -10,13 +10,28 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False,
-                            autoflush=False,
-                            bind=engine)
+# Handle postgres:// connection strings from providers like Supabase
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# In serverless environments, pool_pre_ping and pool_recycle help prevent dropped connection errors
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=300
+) if DATABASE_URL else None
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+) if engine else None
+
 Base = declarative_base()
 
 def get_db():
+    if not SessionLocal:
+        raise RuntimeError("DATABASE_URL is not configured or engine failed to initialize.")
     db = SessionLocal()
     try:
         yield db
@@ -24,6 +39,9 @@ def get_db():
         db.close()
 
 def seed_admin():
+    if not SessionLocal:
+        print("ข้ามการสร้าง Admin: SessionLocal ยังไม่พร้อมใช้งาน")
+        return
     db: Session = SessionLocal()
     from app.models import User
 

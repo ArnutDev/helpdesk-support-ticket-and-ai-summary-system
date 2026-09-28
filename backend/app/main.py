@@ -1,3 +1,4 @@
+import os
 from app.api import summary
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
@@ -13,8 +14,9 @@ async def lifespan(app: FastAPI):
     # โค้ดในบล็อกนี้จะทำงาน "ทันที" ที่เราพิมพ์ uvicorn สตาร์ทระบบ
     print("เซิร์ฟเวอร์กำลังสตาร์ท...")
     try:
-        Base.metadata.create_all(bind=engine)
-        seed_admin() #เพิ่มแอดมินตอนเริ่มระบบ
+        if engine:
+            Base.metadata.create_all(bind=engine)
+            seed_admin() #เพิ่มแอดมินตอนเริ่มระบบ
     except Exception as e:
         print(f"เกิดข้อผิดพลาดในการสร้างตารางหรือ Seeding: {e}")
     yield
@@ -43,9 +45,15 @@ origins = [
     "http://127.0.0.1:5173",
     "https://helpdesk-support-ticket-and-ai-summ.vercel.app"
 ]
+
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url and frontend_url not in origins:
+    origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
