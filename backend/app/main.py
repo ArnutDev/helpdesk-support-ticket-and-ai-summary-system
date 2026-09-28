@@ -1,4 +1,12 @@
 import os
+import sys
+
+# Ensure UTF-8 output encoding on Windows platforms to prevent charmap errors with Thai text
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
 from app.api import summary
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
